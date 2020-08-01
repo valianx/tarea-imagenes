@@ -32,5 +32,6 @@ User.init(
     // options
   }
 );
+// User.sync({ alter: true }).then(() => { });
 // User.sync({ force: true }).then(() => {});
 module.exports = User;

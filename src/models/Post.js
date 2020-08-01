@@ -40,7 +40,7 @@ Post.belongsTo(User, {
     foreignKey: "user_post",
     constraints: false,
 });
-
+// User.sync({ alter: true }).then(() => { });
 // Post.sync({ force: true }).then(() => { });
 
 module.exports = Post;
