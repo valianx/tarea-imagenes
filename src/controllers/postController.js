@@ -1,7 +1,9 @@
 const Post = require("../models/Post");
 const User = require("../models/User");
 const path = require("path");
-const { unlink } = require("fs-extra");
+const {
+    unlink
+} = require("fs-extra");
 
 const nuevoPost = async (req, res) => {
 
@@ -23,7 +25,9 @@ const nuevoPost = async (req, res) => {
 const getPost = async (req, res) => {
 
     Post.findAll({
-        order: [["createdAt", "DESC"]],
+        order: [
+            ["createdAt", "DESC"]
+        ],
     }).then((data) => {
         return res.status(200).json(data);
     }).catch(rr => res.status(500).json("Internal Server Error"))
@@ -32,7 +36,11 @@ const getPost = async (req, res) => {
 const getPostById = async (req, res) => {
     const _id = req.params.id;
     try {
-        Post.findOne({ where: { id: _id } }).then((data) => {
+        Post.findOne({
+            where: {
+                id: _id
+            }
+        }).then((data) => {
             return res.status(200).json(data);
         });
     } catch (e) {
@@ -44,13 +52,14 @@ const getPostById = async (req, res) => {
 const putPost = async (req, res) => {
     const id = req.params.id;
 
-    await Post.update(
-        {
-            titulo: req.body.titulo,
-            descripcion: req.body.descripcion,
-        },
-        { where: { id: id } }
-    ).then((row) => {
+    await Post.update({
+        titulo: req.body.titulo,
+        descripcion: req.body.descripcion,
+    }, {
+        where: {
+            id: id
+        }
+    }).then((row) => {
         return res.status(200).json("ok");
     }).catch(err => res.status(500).json(err))
 
@@ -58,28 +67,38 @@ const putPost = async (req, res) => {
 };
 const deletePost = async (req, res) => {
     const id = req.params.id;
-
-    await Post.findOne({ where: { id: id } }).then(async (data) => {
-        console.log(data.dataValues);
-        if (data.dataValues.imagen != null) await unlink(path.resolve("./public" + data.dataValues.imagen));
-        if (data.dataValues.video != null) await unlink(path.resolve("./public" + data.dataValues.video));
-    }).then(async () => {
+    console.log("flag");
+    try {
+        const post = await Post.findOne({
+            where: {
+                id: id
+            }
+        })
+        try {
+            if (post.dataValues.imagen != null) await unlink(path.resolve("./public" + post.dataValues.imagen));
+            if (post.dataValues.video != null) await unlink(path.resolve("./public" + post.dataValues.video));
+        } catch (err) {
+            console.log(err);
+        }
         await Post.destroy({
             where: {
                 id: id,
             },
-        }).catch(
-            err => res.status(500).json("error eliminar post" + err)
-        );
-        return res.status(200).json("eliminado");
-    }).catch(e => res.status(500).json(e));
-
+        })
+        return res.status(200).json("eliminado")
+    } catch (err) {
+        return res.status(500).json("error eliminar post" + err.message)
+    }
 };
 
 const nuevaImagen = async (req, res) => {
     const id = req.params.id;
 
-    Post.findOne({ where: { id: id } }).then(async data => {
+    Post.findOne({
+        where: {
+            id: id
+        }
+    }).then(async data => {
         let pathImagen = "/uploads/" + req.file.filename;
         if (data.dataValues.imagen != null) {
             try {
@@ -89,8 +108,13 @@ const nuevaImagen = async (req, res) => {
             }
         }
 
-        await Post.update({ imagen: pathImagen, },
-            { where: { id: id } })
+        await Post.update({
+                imagen: pathImagen,
+            }, {
+                where: {
+                    id: id
+                }
+            })
             .then(() => {
                 return res.status(200).json("imagen subida")
             }).catch(e => res.status(500).json(e))
@@ -100,7 +124,11 @@ const nuevaImagen = async (req, res) => {
 const nuevoVideo = async (req, res) => {
     const id = req.params.id;
 
-    Post.findOne({ where: { id: id } }).then(async data => {
+    Post.findOne({
+        where: {
+            id: id
+        }
+    }).then(async data => {
         let pathVideo = "/uploads/" + req.file.filename;
         if (data.dataValues.video != null) {
             try {
@@ -110,8 +138,13 @@ const nuevoVideo = async (req, res) => {
             }
         }
 
-        await Post.update({ video: pathVideo, },
-            { where: { id: id } })
+        await Post.update({
+                video: pathVideo,
+            }, {
+                where: {
+                    id: id
+                }
+            })
             .then(() => {
                 return res.status(200).json("video eliminado")
             }).catch(e => res.status(500).json(e))
@@ -121,7 +154,11 @@ const nuevoVideo = async (req, res) => {
 const deleteVideo = async (req, res) => {
     const id = req.params.id;
 
-    Post.findOne({ where: { id: id } }).then(async data => {
+    Post.findOne({
+        where: {
+            id: id
+        }
+    }).then(async data => {
 
         if (data.dataValues.video != null) {
             try {
@@ -131,8 +168,13 @@ const deleteVideo = async (req, res) => {
             }
         }
 
-        await Post.update({ video: null, },
-            { where: { id: id } })
+        await Post.update({
+                video: null,
+            }, {
+                where: {
+                    id: id
+                }
+            })
             .then(() => {
                 return res.status(200).json("video eliminado")
             }).catch(e => res.status(500).json(e))
@@ -142,7 +184,11 @@ const deleteVideo = async (req, res) => {
 const deleteImagen = async (req, res) => {
     const id = req.params.id;
 
-    Post.findOne({ where: { id: id } }).then(async data => {
+    Post.findOne({
+        where: {
+            id: id
+        }
+    }).then(async data => {
 
         if (data.dataValues.imagen != null) {
             try {
@@ -152,8 +198,13 @@ const deleteImagen = async (req, res) => {
             }
         }
 
-        await Post.update({ imagen: null, },
-            { where: { id: id } })
+        await Post.update({
+                imagen: null,
+            }, {
+                where: {
+                    id: id
+                }
+            })
             .then(() => {
                 return res.status(200).json("imagen eliminada")
             }).catch(e => res.status(500).json(e))
